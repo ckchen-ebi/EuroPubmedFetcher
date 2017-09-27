@@ -76,7 +76,12 @@ public class ParseEuroPubmed {
             for ( int j=0; j<results.size(); j++ ) {
 
                 JSONObject r = results.getJSONObject(j);
-                int pmidFound = r.getInt("pmid");
+
+                String pmidFound = Integer.toString(r.getInt("pmid"));
+
+                if (! pmidFound.equals(pmid)){
+                    continue;  // skip this result, want to avoid a query pmid points to multiple pmids
+                }
 
                 Pubmed pub = new Pubmed();
 
@@ -205,8 +210,8 @@ public class ParseEuroPubmed {
         for (Pubmed pub : papers) { // data does not contain title row
 
             paperCount++;
-            System.out.println(pub.getPmid());
-            System.out.println(pub.getMeshTerms());
+//            System.out.println(pub.getPmid());
+//            System.out.println(pub.getMeshTerms());
 
             int rowCounts = 0;
 
@@ -215,7 +220,7 @@ public class ParseEuroPubmed {
             }
             totalRowCounts += rowCounts;
 
-            System.out.println("need " + rowCounts + " rows");
+            //System.out.println("need " + rowCounts + " rows");
             int start = paperCount == 1 ? 0 : totalRowCounts - rowCounts;
 
             if (totalRowCounts == start){
@@ -226,12 +231,9 @@ public class ParseEuroPubmed {
             // start continues from previous count for row numbers
             for (int c=start; c<totalRowCounts; c++) {
                 meshCount ++;
-                System.out.println("c now "+ c);
                 XSSFRow row = sheet.createRow(c+1);
 
                 int cellNum = 0;
-
-                //int numSubMeshTerms = pub.getSubMeshTerms().size();
 
                 for (String title : titles) {
 
